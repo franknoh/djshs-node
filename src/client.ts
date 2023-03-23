@@ -1,4 +1,5 @@
 import paths from "./paths";
+import rooms from "./rooms";
 import fetch from "node-fetch";
 import { parse } from 'node-html-parser';
 
@@ -52,6 +53,11 @@ export default class Client {
     public getCurrDate(): string {
         let date = new Date();
         return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+    }
+
+    public roomId(name: string): number {
+        // @ts-ignore
+        return Object.keys(rooms).find(key=> rooms[key] === name) as unknown as number;
     }
 
     public async get(url: string, headers?: {[key:string]: string}): Promise<string> {
@@ -122,11 +128,11 @@ export default class Client {
         await this.post(paths.room, `sdate=${date}&time=${time}&mb_id=${this.id}&cls_idx=${room}`)
     }
 
-    public async roomCancel(time: number, date: string): Promise<void> {
+    public async roomCancel(rsvt_idx: number): Promise<void> {
         if (!this.id) {
             throw new Error('Not logged in')
         }
-        await this.post(paths.roomCancel, `sdate=${date}&time=${time}&mb_id=${this.id}`)
+        await this.post(paths.roomCancel, `rsvt_idx=${rsvt_idx}`)
     }
 
     public async getStudentInfo(): Promise<Student> {
