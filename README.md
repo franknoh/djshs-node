@@ -1,5 +1,5 @@
 # djshs
-## fuck djshs
+## for [djshs site](https://djshs.kr)
 
 ### 1. How to install
 ```bash
