@@ -4,7 +4,8 @@ const paths: {[key:string]: string} = {
     'info': 'https://djshs.kr/theme/s007/index/member_modify.php',
     'room': 'https://djshs.kr/theme/s007/index/subpg1_3_upload.php',
     'point': 'https://djshs.kr/theme/s007/index2/stu_subpg2_1.php?sgrade=',
-    'roomCancel': 'https://djshs.kr:443/theme/s007/index/ajax.subpg1_3_delete.php'
+    'roomCancel': 'https://djshs.kr:443/theme/s007/index/ajax.subpg1_3_delete.php',
+    'view': 'https://djshs.kr:443/theme/s007/index/ajax.member_view.php'
 };
 
 export default paths;

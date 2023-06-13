@@ -5,13 +5,14 @@ import { parse } from 'node-html-parser';
 
 interface Student {
     name: string;
-    studentId: number;
+    studentId: string;
     sex: '남' | '여';
     grade: number;
     class: number;
     number: number;
     tel: string;
     parentTel: string;
+    profile: string | undefined;
 }
 
 interface Point {
@@ -24,7 +25,7 @@ interface Point {
 }
 
 export default class Client {
-    public id: number = 0;
+    public id: string = '';
     public cookie: { [key: string]: string } = {};
     public headers: { [key: string]: string } = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -109,7 +110,7 @@ export default class Client {
             return res.text()
         })
     }
-    public async login(id: number, password: string): Promise<boolean> {
+    public async login(id: string, password: string): Promise<boolean> {
         await this.get(paths.base)
         await this.post(paths.login, `mb_id=${id}&mb_password=${password}`, {
             'Referer': paths.loginPage
@@ -148,13 +149,14 @@ export default class Client {
         })
         return {
             'name': data[0].innerText.trim().substring(12),
-            'studentId': parseInt(data[1].innerText.trim().substring(13)),
+            'studentId': data[1].innerText.trim().substring(13),
             'sex': data[2].innerText.trim().substring(12) as '남' | '여',
             'grade': parseInt(data[3].innerText.trim().substring(12)),
             'class': parseInt(data[4].innerText.trim().substring(11)),
             'number': parseInt(data[5].innerText.trim().substring(12)),
             'tel': data[6].innerText.trim().substring(16),
-            'parentTel': data[7].innerText.trim().substring(17)
+            'parentTel': data[7].innerText.trim().substring(17),
+            'profile': parse(text).querySelectorAll('img')[7].getAttribute('src')
         }
     }
 
@@ -186,3 +188,23 @@ export default class Client {
         return parseInt(parse(text).querySelectorAll('h5')[18].innerText.substring(9));
     }
 }
+
+class Admin extends Client {
+    public async getStudentInfoById(id: string): Promise<Student> {
+        let text = await this.post(paths.view, `mb_id=${id}`);
+        let data = parse(text);
+        return {
+            'name': data.querySelectorAll('h5')[0].innerText.trim(),
+            'studentId': id,
+            'sex': data.querySelectorAll('h6')[1].innerText.trim().substring(3) as '남' | '여',
+            'grade': parseInt(data.querySelectorAll('h6')[0].innerText.trim().substring(8).split('/')[0].split('학년')[0]),
+            'class': parseInt(data.querySelectorAll('h6')[0].innerText.trim().substring(8).split('/')[1].split('반')[0]),
+            'number': parseInt(data.querySelectorAll('h6')[0].innerText.trim().substring(8).split('/')[2].split('번호')[0]),
+            'tel': data.querySelectorAll('h6')[2].innerText.trim().substring(7),
+            'parentTel': data.querySelectorAll('h6')[3].innerText.trim().substring(8),
+            'profile': data.querySelectorAll('img')[0].getAttribute('src')
+        }
+    }
+}
+
+export {Client, Admin}
